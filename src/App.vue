@@ -1,26 +1,65 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app">
+    <MapLocation
+      :apiKey="apiKey"
+      :location="currentLocation"
+      @location-updated="handleLocationUpdated"
+    />
+
+    <DisplayTable
+      :items="searchHistory"
+      @delete-selected="deleteSelected"
+    />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import MapLocation from './components/MapLocation.vue';
+import DisplayTable from './components/DisplayTable.vue';
 
 export default {
   name: 'App',
+
   components: {
-    HelloWorld
-  }
+    MapLocation,
+    DisplayTable,
+  },
+
+  data() {
+    return {
+      apiKey: process.env.VUE_APP_API_KEY,
+      currentLocation: {
+        lat: 0,
+        lng: 0,
+      },
+      searchHistory: [],
+    }
+  },
+
+  methods: {
+    handleLocationUpdated(location) {
+      this.searchHistory.unshift({
+        id: this.searchHistory.length + 1,
+        location: `(${location.lat}, ${location.lng})`,
+      })
+    },
+
+    deleteSelected(selectedItems) {
+      for (const item of selectedItems) {
+        const index = this.searchHistory.indexOf(item);
+        if (index !== -1) {
+          this.searchHistory.splice(index, 1);
+        }
+      }
+    },
+  },
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+.app {
+  font-family: 'Roboto', sans-serif;
 }
 </style>
